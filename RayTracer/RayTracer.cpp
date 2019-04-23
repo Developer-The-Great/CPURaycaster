@@ -22,7 +22,7 @@ int main()
 	const int width = 400;
 	const int height = 400;
 
-	rayTrace(width,height);
+	//rayTrace(width,height);
 
 	
 
@@ -38,6 +38,7 @@ void rayTrace(int width,int height)
 {
 	unsigned int Total = width * height;
 	//make a new image
+
 	for (int i = 0; i < height; i++)
 	{
 		unsigned int CurrentRow = i * width;
@@ -49,7 +50,7 @@ void rayTrace(int width,int height)
 
 			//find the final color
 			
-			if(j%10 == 0)
+			if(j%100 == 0)
 			{
 				cout << "Completed pixels " << CurrentRow + j << "/" << Total << std::endl;
 			}
