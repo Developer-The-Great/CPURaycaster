@@ -4,11 +4,21 @@
 #include "pch.h"
 #include <iostream>
 #include <string>
+#include "FreeImage.h"
+#include "Image.h"
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
+
+#define WIDTH 400
+#define HEIGHT 400
+
+#define OUT
 
 using std::cout;
 using std::endl;
 
-void rayTrace(int width, int height);
+Image* rayTrace(int width, int height, std::string fileName);
 
 int main()
 {
@@ -19,25 +29,35 @@ int main()
 
 	std::getline(std::cin, fileName);
 
-	const int width = 400;
-	const int height = 400;
+	Image* image = rayTrace(WIDTH, HEIGHT, fileName);
 
-	//rayTrace(width,height);
-
+	if (image)
+	{
+		image->SaveImage();
+		delete image;
+	}
+	else
+	{
+		cout << "ERROR::IMAGE_IS_NULL" << endl;
+	}
 	
 
-
-
-
-
-
-
-
+	
+	
+	return 0;
 }
-void rayTrace(int width,int height)
+Image* rayTrace(int width,int height, std::string fileName)
 {
 	unsigned int Total = width * height;
 	//make a new image
+	Image* image = new Image(width, height, fileName);
+
+	if (!image->bitmap) 
+	{ 
+		cout << "NULL_BITMAP" << endl; 
+		return nullptr;
+	}
+
 
 	for (int i = 0; i < height; i++)
 	{
@@ -45,11 +65,14 @@ void rayTrace(int width,int height)
 		for (int j = 0; j < width; j++)
 		{
 			//shoot a ray through the pixel
-
+			
 			//check for intersection
 
 			//find the final color
-			
+			glm::vec3 color = glm::vec3(0, (double)j / width * 255.0, (double)i / height * 255.0);
+	
+			image->SetPixel(j, i, color);
+
 			if(j%100 == 0)
 			{
 				cout << "Completed pixels " << CurrentRow + j << "/" << Total << std::endl;
@@ -57,8 +80,10 @@ void rayTrace(int width,int height)
 		}
 	}
 	cout << "IMAGE_COMPLETED" << endl;
-	//return image
 
+	
+	//return image
+	return image;
 
 }
 
