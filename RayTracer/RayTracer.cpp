@@ -4,21 +4,24 @@
 #include "pch.h"
 #include <iostream>
 #include <string>
-#include "FreeImage.h"
-#include "Image.h"
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
+#include <gtx/string_cast.hpp>
+#include "Ray.h"
+
+#include "FreeImage.h"
+#include "Scene.h"
+#include "Image.h"
 
 #define WIDTH 400
 #define HEIGHT 400
 
-#define OUT
 
 using std::cout;
 using std::endl;
 
-Image* rayTrace(int width, int height, std::string fileName);
+Image* rayTrace(int width, int height, std::string fileName, Scene*scene);
 
 int main()
 {
@@ -29,7 +32,11 @@ int main()
 
 	std::getline(std::cin, fileName);
 
-	Image* image = rayTrace(WIDTH, HEIGHT, fileName);
+	Scene* scene = new Scene(fileName);
+
+
+
+	Image* image = rayTrace(WIDTH, HEIGHT, fileName,scene);
 
 	if (image)
 	{
@@ -42,11 +49,11 @@ int main()
 	}
 	
 
-	
+	delete scene;
 	
 	return 0;
 }
-Image* rayTrace(int width,int height, std::string fileName)
+Image* rayTrace(int width,int height, std::string fileName, Scene*scene)
 {
 	unsigned int Total = width * height;
 	//make a new image
@@ -58,16 +65,23 @@ Image* rayTrace(int width,int height, std::string fileName)
 		return nullptr;
 	}
 
+	Ray ray(WIDTH, HEIGHT);
+	Camera* cam = scene->GetCam();
 
-	for (int i = 0; i < height; i++)
+	cout << "cam w " << glm::to_string(-cam->GetWAxis()) << endl;
+	for (int i = 0; i < height; ++i)
 	{
 		unsigned int CurrentRow = i * width;
-		for (int j = 0; j < width; j++)
+		for (int j = 0; j < width; ++j)
 		{
 			//shoot a ray through the pixel
-			
+			glm::vec3 direction = ray.FindRayDirection(cam, i, j);
 			//check for intersection
-
+			if (i == 200 && j == 200)
+			{
+				cout << "for height " << i << ",width " << j << " direction: " << glm::to_string(direction) << endl;
+			}
+			
 			//find the final color
 			glm::vec3 color = glm::vec3(0, (double)j / width * 255.0, (double)i / height * 255.0);
 	
@@ -75,7 +89,7 @@ Image* rayTrace(int width,int height, std::string fileName)
 
 			if(j%100 == 0)
 			{
-				cout << "Completed pixels " << CurrentRow + j << "/" << Total << std::endl;
+				//cout << "Completed pixels " << CurrentRow + j << "/" << Total << std::endl;
 			}
 		}
 	}

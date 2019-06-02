@@ -155,13 +155,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="PrimitiveObject.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Triangle.h" />
+    <ClInclude Include="TriangularObject.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="pch.cpp">
@@ -170,9 +176,13 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="PrimitiveObject.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="RayTracer.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="Triangle.cpp" />
+    <ClCompile Include="TriangularObject.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

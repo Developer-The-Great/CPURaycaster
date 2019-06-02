@@ -44,7 +44,7 @@ void Image::SetPixel(int w, int h, glm::vec3 rgb)
 
 void Image::SaveImage()
 {
-	if (FreeImage_Save(FIF_PNG, bitmap, filename.c_str(), 0))
+	if (FreeImage_Save(FIF_PNG, bitmap, "image.png", 0))
 	{
 		std::cout << "IMAGE_SAVED" << std::endl;
 	}
