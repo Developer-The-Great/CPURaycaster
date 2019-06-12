@@ -14,7 +14,7 @@ Triangle::~Triangle()
 {
 }
 
-glm::vec3 * Triangle::GetTriangles()
+glm::vec3 * Triangle::GetTriangles() 
 {
 	return triangles;
 }
@@ -26,7 +26,7 @@ std::ostream & operator<<(std::ostream& os, Triangle& triangle)
 
 	for (size_t i = 0; i < TRIANGLEVERTICES; i++)
 	{
-		std::cout << triangle.triangles[i].x << " " << triangle.triangles[i].y << " " << triangle.triangles[i].y << std::endl;
+		os << glm::to_string(triangle.triangles[i]) << std::endl;
 	}
 	
 	return os;

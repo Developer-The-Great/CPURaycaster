@@ -10,6 +10,7 @@ public:
 	PrimitiveObject(glm::vec3 ambientToSet,glm::vec3 PositionToSet);
 	PrimitiveObject();
 
+	virtual glm::vec3 GetAmbient();
 	~PrimitiveObject();
 
 private:

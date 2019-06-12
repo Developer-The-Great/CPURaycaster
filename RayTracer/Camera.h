@@ -14,6 +14,8 @@ public:
 	glm::vec3 GetWAxis();
 	glm::vec3 GetUAxis();
 	glm::vec3 GetVAxis();
+
+	glm::vec3 GetCamPos();
 	float GetFov();
 
 private:
@@ -25,7 +27,7 @@ private:
 	glm::vec3 Up;
 	float fov;
 
-	void createCoordinateFrame(glm::vec3 pos, glm::vec3 lookAtPos, glm::vec3 upDirection, float fovVec);
+	void createCoordinateFrame(glm::vec3 pos, glm::vec3 lookAtPos, glm::vec3 upDirection);
 
 
 };

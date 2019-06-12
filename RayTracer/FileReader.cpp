@@ -2,6 +2,7 @@
 #include "FileReader.h"
 #include "Scene.h"
 #include "TriangularObject.h"
+#include "Sphere.h"
 
 #define VEC3VALS 3
 
@@ -17,6 +18,7 @@ FileReader::FileReader()
 
 void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 {
+	int TriCount = 0;
 	std::ifstream File;
 
 	File.open(fileName);
@@ -44,11 +46,11 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 		std::stringstream s(str);
 		std::string test;
 		s >> test;
+		
+		std::cout << "oldcmd :" << oldCmd << std::endl;
+		std::cout << "cmd :" << test << std::endl;
 
-		/*std::cout << "oldcmd :" << oldCmd << std::endl;
-		std::cout << "cmd :" << test << std::endl;*/
-
-		//if line in not blanked or commented
+		//if line in not blank or commented
 		if (str.find_first_not_of(" /t/n/r") != std::string::npos && str[0] != '#')
 		{
 			std::stringstream s(str);
@@ -91,7 +93,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				if (validInput )
 				{
 					scene->vertices.push_back(glm::vec3(values[0], values[1], values[2]));
-					std::cout << "vertice: " << scene->vertices.back().x << " " << scene->vertices.back().y << " " << scene->vertices.back().z << std::endl;
+					std::cout << "vertice: " << values[0] << " " << values[1] << " " << values[2] << std::endl;
 				}
 			}
 			else if (cmd == "tri")
@@ -109,7 +111,6 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				////set values
 				
 			}
-
 			else if (cmd == "camera")
 			{
 				//position,lookAt,Fov
@@ -135,25 +136,36 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 
 
 			}
-
 			else if (cmd == "sphere")
 			{
-
+				validInput = GetValues(s, 4, values);
+				std::cout << "sphere found" << std::endl;
+				if (validInput)
+				{
+					std::cout << "values " << values[0] << " " << values[1] << " " << values[2] << " " << std::endl;
+					glm::vec3 spherePos(values[0], values[1], values[2]);
+					scene->AddPrimitive(new Sphere(spherePos,ambient,values[3]));
+				}
 			}
 			
 		}
-		/*else
+		else
 		{
-			std::cout << "found a comment" << std::endl;
-		}*/
+			cmd = "";
+		}
 
-		if (oldCmd == "tri" && test != "tri" || oldCmd == "tri" && File.eof())
+		if ((oldCmd == "tri" && test != "tri") || (oldCmd == "tri" && File.eof()))
 		{
 			//Triangular object complemted
-			scene->primitives.push_back(TriangularObject(ambient, position,scene->vertices, tempIndices));
+			if (!tempIndices.empty()) 
+			{
+				scene->AddPrimitive(new TriangularObject(ambient, position, scene->vertices, tempIndices));
 
-			std::cout << "triangular object created" << std::endl;
-			tempIndices.clear();
+				std::cout << "--[x]triangular object created" << TriCount << std::endl;
+				tempIndices.clear();
+				TriCount++;
+			}
+			
 		}
 
 

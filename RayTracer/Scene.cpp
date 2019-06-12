@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "Scene.h"
 #include "FileReader.h"
-
+#include "TriangularObject.h"
+#include "Sphere.h"
 #include <gtx/string_cast.hpp>
 
 using std::cout;
@@ -29,25 +30,55 @@ Camera * Scene::GetCam()
 }
 
 
+std::vector<PrimitiveObject*> Scene::GetPrimitives()
+{
+	return primitives;
+}
+
+void Scene::AddPrimitive(PrimitiveObject* obj)
+{
+	primitives.push_back(obj);
+}
+
 Scene::~Scene()
 {
+
+	for (auto obj : primitives)
+	{
+		delete obj;
+	}
+	primitives.clear();
+	
 	delete Cam;
 }
 
 void Scene::checkSceneValidity()
 {
+	cout << "----------Scene Validity Check-----------" << glm::to_string(CameraPos) << endl;
 	cout << "CameraPos: " << glm::to_string(CameraPos) << endl;
-	cout << "CameraLoc: " << glm::to_string(CameraLookAt) << endl;
+	cout << "CameraLookAt: " << glm::to_string(CameraLookAt) << endl;
 	cout << "CameraUp: " << glm::to_string(Up) << endl;
 	cout << "Fov " << Fov << std::endl;
 
-	std::vector<PrimitiveObject>::iterator iter;
+	std::vector<PrimitiveObject*>::iterator iter;
 
-	/*for (iter = primitives.begin(); iter < primitives.end; iter++)
+	for (auto primitive : primitives)
 	{
-		cout << iter->
-	}*/
+		TriangularObject* triObj = dynamic_cast<TriangularObject*>(primitive);
 
-
+		if (triObj)
+		{
+			cout << *triObj << endl;
+		}
+		else
+		{
+			Sphere* sphere = dynamic_cast<Sphere*>(primitive);
+			if (sphere)
+			{
+				cout << *sphere << endl;
+			}
+		}
+		
+	}
 
 }

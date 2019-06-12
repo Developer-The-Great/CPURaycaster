@@ -12,7 +12,7 @@ class Triangle
 public:
 	Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c);
 	~Triangle();
-	glm::vec3* GetTriangles();
+	glm::vec3* GetTriangles() ;
 
 	friend std::ostream& operator<<(std::ostream& os, Triangle& triangle);
 

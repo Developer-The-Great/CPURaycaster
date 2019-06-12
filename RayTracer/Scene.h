@@ -15,8 +15,8 @@ class Scene
 {
 public:
 	int width, height;
-
-	std::vector<PrimitiveObject> primitives;
+	
+	
 
 	std::vector<glm::vec3> vertices;
 	
@@ -25,15 +25,20 @@ public:
 	glm::vec3 CameraPos;
 	glm::vec3 Up;
 	glm::vec3 CameraLookAt;
+
 	Camera* GetCam();
 
 	float Fov;
 
+	std::vector<PrimitiveObject*> GetPrimitives();
+	void AddPrimitive(PrimitiveObject* obj);
 
 	~Scene();
 private:
 
 	void checkSceneValidity();
+
+	std::vector<PrimitiveObject*> primitives;
 
 	Camera *Cam;
 
