@@ -2,12 +2,11 @@
 #include "FileReader.h"
 #include "Scene.h"
 #include "TriangularObject.h"
+#include "Transform.h"
 #include "Sphere.h"
+#include <stack>
 
 #define VEC3VALS 3
-
-
-
 
 FileReader::FileReader()
 {
@@ -32,10 +31,16 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 	std::cout << "FILE_SUCESSFULLY_READ" << std::endl;
 
 	std::string str, cmd;
+
 	//temporary values
 	std::vector<int>tempIndices;
-	glm::vec3 ambient; 
-	glm::vec3 position(0, 0, 0);
+	vec3 ambient; 
+	vec3 position(0,0,0);
+
+	//intialize matrix stack
+	std::stack<mat4> stack;
+	//push identity matrix
+	stack.push(mat4(1.0f));
 
 	bool validInput;
 	int verts = 0;
@@ -56,10 +61,11 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 			std::stringstream s(str);
 			//std::stringstream s(str);
 			float values[10];
-			//get command
+			//get command of line
 			s >> cmd;
 			
-			//if cmd is the same as a known command
+			//-----if cmd is the equal to a known command----------
+				//-----execute command----
 			if (cmd == "size")
 			{
 				validInput = GetValues(s, 2, values);
@@ -143,23 +149,69 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				if (validInput)
 				{
 					std::cout << "values " << values[0] << " " << values[1] << " " << values[2] << " " << std::endl;
-					glm::vec3 spherePos(values[0], values[1], values[2]);
+					vec3 spherePos(values[0], values[1], values[2]);
 					scene->AddPrimitive(new Sphere(spherePos,ambient,values[3]));
 				}
 			}
+			else if (cmd == "pushTransform")
+			{
+				stack.push(stack.top());
+			}
+
+			else if (cmd == "popTransform")
+			{
+				if (stack.size() <= 1)
+				{
+					std::cout << "ERROR::STACK_HAS_NO_ELEMENTS" << std::endl;
+				}
+				else
+				{
+					stack.pop();
+				}
+			}
+
 			
+			else if (cmd == "translate")
+			{
+				validInput = GetValues(s, 3, values);
+				std::cout << "translate " << std::endl;
+				if (validInput)
+				{
+					std::cout << "values " << values[0] << " " << values[1] << " " << values[2] << " " << std::endl;
+					RightMultiply(Transform::translate(values[0], values[1], values[2]), stack);
+				}
+				
+	
+			}
+
+			else if (cmd == "scale")
+			{
+				validInput = GetValues(s, 3, values);
+				std::cout << "scale " << std::endl;
+				if (validInput)
+				{
+					std::cout << "values " << values[0] << " " << values[1] << " " << values[2] << " " << std::endl;
+					RightMultiply(Transform::scale(values[0], values[1], values[2]), stack);
+				}
+			}
 		}
+		
 		else
 		{
+			//cmd string will now store an empty string instead of old commands(this will happen if a comment is found)
 			cmd = "";
 		}
 
+		//if the previous command is a triangle and the next is not a triangle
 		if ((oldCmd == "tri" && test != "tri") || (oldCmd == "tri" && File.eof()))
 		{
 			//Triangular object complemted
 			if (!tempIndices.empty()) 
 			{
-				scene->AddPrimitive(new TriangularObject(ambient, position, scene->vertices, tempIndices));
+				TriangularObject* Obj = new TriangularObject(ambient, position, scene->vertices, tempIndices);
+				scene->AddPrimitive(Obj);
+				Obj->transform = stack.top();
+
 
 				std::cout << "--[x]triangular object created" << TriCount << std::endl;
 				tempIndices.clear();
@@ -190,6 +242,13 @@ bool FileReader::GetValues(std::stringstream &s, const int numValues, float* val
 	}
 
 	return true;
+}
+
+void FileReader::RightMultiply(const mat4 M, std::stack<mat4>& stack)
+{
+	mat4& T = stack.top();
+
+	T = T * M;
 }
 
 

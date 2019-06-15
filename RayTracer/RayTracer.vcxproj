@@ -163,6 +163,7 @@
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="TriangularObject.h" />
   </ItemGroup>
@@ -181,6 +182,7 @@
     <ClCompile Include="RayTracer.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="TriangularObject.cpp" />
   </ItemGroup>

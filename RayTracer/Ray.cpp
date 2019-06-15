@@ -76,6 +76,7 @@ PrimitiveObject * Ray::IntersectionCheck( Scene*scene)
 		//determine object type
 		//TriangularObject obj((TriangularObject)*iter);
 		TriangularObject* TriangularObj = dynamic_cast<TriangularObject*>(*iter);
+
 		//if primitive object is a triangle
 		if (TriangularObj)
 		{

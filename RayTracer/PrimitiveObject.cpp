@@ -9,6 +9,7 @@ PrimitiveObject::PrimitiveObject(glm::vec3 ambientToSet, glm::vec3 PositionToSet
 {
 	ambient = ambientToSet* COLOR;
 	position = PositionToSet;
+	transform = mat4(1.0);
 }
 
 PrimitiveObject::PrimitiveObject()
