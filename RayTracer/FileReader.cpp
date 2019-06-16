@@ -65,7 +65,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 			s >> cmd;
 			
 			//-----if cmd is the equal to a known command----------
-				//-----execute command----
+				//-----set values for said command----
 			if (cmd == "size")
 			{
 				validInput = GetValues(s, 2, values);
@@ -74,10 +74,11 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				{
 					scene->width = (int)values[0];
 					scene->height = (int)values[1];
+
 				}
 				////get values
 				////set values
-				std::cout << "size found" << std::endl;
+				std::cout << "size found " << scene->width <<" " << scene->height << std::endl;
 			}
 			else if (cmd == "ambient")
 			{
@@ -88,7 +89,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 			}
 			else if (cmd == "maxverts")
 			{
-				//set program to store a cube
+				
 				validInput = GetValues(s, 1, values);
 				int MaxVerts = values[0];
 			}
@@ -150,7 +151,10 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				{
 					std::cout << "values " << values[0] << " " << values[1] << " " << values[2] << " " << std::endl;
 					vec3 spherePos(values[0], values[1], values[2]);
-					scene->AddPrimitive(new Sphere(spherePos,ambient,values[3]));
+					Sphere* sphere = new Sphere(spherePos, ambient, values[3]);
+
+					scene->AddPrimitive(sphere);
+					sphere->transform = stack.top();
 				}
 			}
 			else if (cmd == "pushTransform")
@@ -178,7 +182,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				if (validInput)
 				{
 					std::cout << "values " << values[0] << " " << values[1] << " " << values[2] << " " << std::endl;
-					RightMultiply(Transform::translate(values[0], values[1], values[2]), stack);
+					RightMultiply(glm::transpose(Transform::translate(values[0], values[1], values[2])), stack);
 				}
 				
 	
@@ -191,7 +195,21 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				if (validInput)
 				{
 					std::cout << "values " << values[0] << " " << values[1] << " " << values[2] << " " << std::endl;
-					RightMultiply(Transform::scale(values[0], values[1], values[2]), stack);
+					RightMultiply(glm::transpose(Transform::scale(values[0], values[1], values[2])), stack);
+				}
+			}
+			else if (cmd == "rotate")
+			{
+				validInput = GetValues(s, 4, values);
+				std::cout << "rotate " << std::endl;
+				if (validInput)
+				{
+					std::cout << "values " << values[0] << " " << values[1] << " " << values[2] << " " << std::endl;
+					mat3 Rot = Transform::rotate(values[3],vec3(values[0], values[1], values[2]));
+
+					
+					mat4 rot(Rot);
+					RightMultiply(rot, stack);
 				}
 			}
 		}
@@ -205,7 +223,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 		//if the previous command is a triangle and the next is not a triangle
 		if ((oldCmd == "tri" && test != "tri") || (oldCmd == "tri" && File.eof()))
 		{
-			//Triangular object complemted
+			//Triangular object has been completed
 			if (!tempIndices.empty()) 
 			{
 				TriangularObject* Obj = new TriangularObject(ambient, position, scene->vertices, tempIndices);
@@ -249,6 +267,7 @@ void FileReader::RightMultiply(const mat4 M, std::stack<mat4>& stack)
 	mat4& T = stack.top();
 
 	T = T * M;
+
 }
 
 

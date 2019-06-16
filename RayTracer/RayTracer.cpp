@@ -14,8 +14,8 @@
 #include "Scene.h"
 #include "Image.h"
 
-#define WIDTH 640
-#define HEIGHT 480
+//#define WIDTH 640
+//#define HEIGHT 480
 
 using std::cout;
 using std::endl;
@@ -34,7 +34,7 @@ int main()
 
 	Scene* scene = new Scene(fileName);
 
-	Image* image = rayTrace(WIDTH, HEIGHT, fileName,scene);
+	Image* image = rayTrace(scene->width, scene->height, fileName,scene);
 
 	if (image)
 	{
@@ -68,6 +68,7 @@ Image* rayTrace(int width,int height, std::string fileName, Scene*scene)
 	cout << "cam w " << glm::to_string(cam->GetWAxis()) << endl;
 	cout << "cam u " << glm::to_string(cam->GetUAxis()) << endl;
 	cout << "cam v " << glm::to_string(cam->GetVAxis()) << endl;
+
 	for (int i = 0; i < height; ++i)
 	{
 		unsigned int CurrentRow = i * width;

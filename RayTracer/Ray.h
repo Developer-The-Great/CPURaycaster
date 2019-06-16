@@ -6,6 +6,11 @@
 
 
 #define OUT
+
+typedef glm::vec4 vec4;
+typedef glm::vec3 vec3;
+typedef glm::mat4 mat4;
+
 class Camera;
 class PrimitiveObject;
 class Scene;
@@ -33,7 +38,7 @@ public:
 
 	PrimitiveObject * IntersectionCheck(Scene*scene);
 
-	RayIntersectInformation RayTriangleIntersect(Triangle tri, glm::vec3 EyePos);
+	RayIntersectInformation RayTriangleIntersect(Triangle tri, glm::vec3 EyePos, mat4 transforms);
 
 	RayIntersectInformation RaySphereIntersect(const Sphere* sphere, glm::vec3 eyePos);
 
