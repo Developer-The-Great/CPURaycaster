@@ -5,9 +5,10 @@
 
 
 
-PrimitiveObject::PrimitiveObject(glm::vec3 ambientToSet, glm::vec3 PositionToSet)
+PrimitiveObject::PrimitiveObject(vec3 ambientToSet, vec3 diffuseToSet,vec3 PositionToSet)
 {
-	ambient = ambientToSet* COLOR;
+	ambient = ambientToSet * COLOR;
+	diffuse = diffuseToSet * COLOR;
 	position = PositionToSet;
 	transform = mat4(1.0);
 }
@@ -19,6 +20,11 @@ PrimitiveObject::PrimitiveObject()
 glm::vec3 PrimitiveObject::GetAmbient()
 {
 	return ambient;
+}
+
+glm::vec3 PrimitiveObject::GetDiffuse()
+{
+	return diffuse;
 }
 
 PrimitiveObject::~PrimitiveObject()

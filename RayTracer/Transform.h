@@ -6,7 +6,7 @@ typedef glm::mat3 mat3;
 typedef glm::mat4 mat4;
 typedef glm::vec3 vec3;
 
-const float pi = 3.14159265;
+const double pi = 3.14159265;
 
 class Transform
 {

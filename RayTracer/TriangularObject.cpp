@@ -6,8 +6,8 @@
 using std::cout;
 using std::endl;
 
-TriangularObject::TriangularObject(glm::vec3 AmbientToSet,glm::vec3 PositionToSet,std::vector<glm::vec3>vertices,std::vector<int>indices)
-	:PrimitiveObject(AmbientToSet, PositionToSet)
+TriangularObject::TriangularObject(vec3 AmbientToSet, vec3 diffuseToSet,vec3 PositionToSet,std::vector<glm::vec3>vertices,std::vector<int>indices)
+	:PrimitiveObject(AmbientToSet, diffuseToSet, PositionToSet)
 {
 	
 

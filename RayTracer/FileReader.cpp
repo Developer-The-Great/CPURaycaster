@@ -5,12 +5,13 @@
 #include "Transform.h"
 #include "Sphere.h"
 #include <stack>
-
-#define VEC3VALS 3
+#include "PointLight.h"
+#include "DirectionalLight.h"
+#include <gtx/string_cast.hpp>
 
 FileReader::FileReader()
 {
-	
+
 
 
 }
@@ -21,7 +22,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 	std::ifstream File;
 
 	File.open(fileName);
-	
+
 	if (!File.is_open())
 	{
 		std::cout << "FILE_NOT_SUCESSFULLY_READ" << std::endl;
@@ -34,8 +35,10 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 
 	//temporary values
 	std::vector<int>tempIndices;
-	vec3 ambient; 
-	vec3 position(0,0,0);
+	vec3 ambient;
+	vec3 emission(0, 0, 0);
+	vec3 diffuse(0, 0, 0);
+	vec3 position(0, 0, 0);
 
 	//intialize matrix stack
 	std::stack<mat4> stack;
@@ -44,14 +47,14 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 
 	bool validInput;
 	int verts = 0;
-	std::string oldCmd ="";
+	std::string oldCmd = "";
 
 	while (std::getline(File, str))
 	{
 		std::stringstream s(str);
 		std::string test;
 		s >> test;
-		
+
 		std::cout << "oldcmd :" << oldCmd << std::endl;
 		std::cout << "cmd :" << test << std::endl;
 
@@ -63,11 +66,12 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 			float values[10];
 			//get command of line
 			s >> cmd;
-			
+
 			//-----if cmd is the equal to a known command----------
 				//-----set values for said command----
 			if (cmd == "size")
 			{
+
 				validInput = GetValues(s, 2, values);
 
 				if (validInput)
@@ -78,26 +82,20 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				}
 				////get values
 				////set values
-				std::cout << "size found " << scene->width <<" " << scene->height << std::endl;
+				std::cout << "size found " << scene->width << " " << scene->height << std::endl;
 			}
-			else if (cmd == "ambient")
-			{
-				validInput = GetValues(s, 3, values);
-				ambient[0] = values[0];
-				ambient[1] = values[1];
-				ambient[2] = values[2];
-			}
+			
 			else if (cmd == "maxverts")
 			{
-				
+
 				validInput = GetValues(s, 1, values);
 				int MaxVerts = values[0];
 			}
 			else if (cmd == "vertex")
 			{
-				
+
 				validInput = GetValues(s, VEC3VALS, values);
-				if (validInput )
+				if (validInput)
 				{
 					scene->vertices.push_back(glm::vec3(values[0], values[1], values[2]));
 					std::cout << "vertice: " << values[0] << " " << values[1] << " " << values[2] << std::endl;
@@ -107,7 +105,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 			{
 				validInput = GetValues(s, VEC3VALS, values);
 				std::cout << "tri found" << std::endl;
-				
+
 				if (validInput)
 				{
 					tempIndices.push_back(values[0]);
@@ -116,7 +114,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				}
 				////get values
 				////set values
-				
+
 			}
 			else if (cmd == "camera")
 			{
@@ -138,7 +136,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 					scene->Up[2] = values[8];
 
 					scene->Fov = values[9];
-					
+
 				}
 
 
@@ -151,7 +149,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				{
 					std::cout << "values " << values[0] << " " << values[1] << " " << values[2] << " " << std::endl;
 					vec3 spherePos(values[0], values[1], values[2]);
-					Sphere* sphere = new Sphere(spherePos, ambient, values[3]);
+					Sphere* sphere = new Sphere(spherePos,diffuse, ambient, values[3]);
 
 					scene->AddPrimitive(sphere);
 					sphere->transform = stack.top();
@@ -174,7 +172,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				}
 			}
 
-			
+
 			else if (cmd == "translate")
 			{
 				validInput = GetValues(s, 3, values);
@@ -184,8 +182,8 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 					std::cout << "values " << values[0] << " " << values[1] << " " << values[2] << " " << std::endl;
 					RightMultiply(glm::transpose(Transform::translate(values[0], values[1], values[2])), stack);
 				}
-				
-	
+
+
 			}
 
 			else if (cmd == "scale")
@@ -205,15 +203,69 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				if (validInput)
 				{
 					std::cout << "values " << values[0] << " " << values[1] << " " << values[2] << " " << std::endl;
-					mat3 Rot = Transform::rotate(values[3],vec3(values[0], values[1], values[2]));
+					mat3 Rot = Transform::rotate(values[3], vec3(values[0], values[1], values[2]));
 
-					
+
 					mat4 rot(Rot);
 					RightMultiply(rot, stack);
 				}
 			}
+			else if (cmd == "ambient")
+			{
+				validInput = GetValues(s, 3, values);
+				if (validInput)
+				{
+					ambient[0] = values[0];
+					ambient[1] = values[1];
+					ambient[2] = values[2];
+				}
+				
+			}
+			else if (cmd == "diffuse")
+			{
+				validInput = GetValues(s, 3, values);
+				if (validInput)
+				{
+					diffuse[0] = values[0];
+					diffuse[1] = values[1];
+					diffuse[2] = values[2];
+				}
+			}
+			else if (cmd == "specular")
+			{
+
+			}
+			else if (cmd == "shininess")
+			{
+
+			}
+			else if (cmd == "emission")
+			{
+			validInput = GetValues(s, 3, values);
+			if (validInput)
+			{
+				scene->emission[0] = values[0];
+				scene->emission[1] = values[1];
+				scene->emission[2] = values[2];
+			}
+				
+			}
+
+			else if (cmd == "point")
+			{
+				validInput = GetValues(s, 6, values);
+				if (validInput)
+				{
+					std::cout << "Point light found" << std::endl;
+					std::cout << glm::to_string(vec3(values[0], values[1], values[2]));
+					PointLight* pointLight = new PointLight(vec3(values[0], values[1], values[2]), vec3(values[3], values[4], values[5]));
+					scene->AddLight(pointLight);
+				}
+
+			}
+
 		}
-		
+
 		else
 		{
 			//cmd string will now store an empty string instead of old commands(this will happen if a comment is found)
@@ -224,9 +276,9 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 		if ((oldCmd == "tri" && test != "tri") || (oldCmd == "tri" && File.eof()))
 		{
 			//Triangular object has been completed
-			if (!tempIndices.empty()) 
+			if (!tempIndices.empty())
 			{
-				TriangularObject* Obj = new TriangularObject(ambient, position, scene->vertices, tempIndices);
+				TriangularObject* Obj = new TriangularObject(ambient,diffuse, position, scene->vertices, tempIndices);
 				scene->AddPrimitive(Obj);
 				Obj->transform = stack.top();
 
@@ -235,13 +287,13 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				tempIndices.clear();
 				TriCount++;
 			}
-			
+
 		}
 
 
 		oldCmd = cmd;
 
-		
+
 	}
 	File.close();
 }
@@ -256,7 +308,7 @@ bool FileReader::GetValues(std::stringstream &s, const int numValues, float* val
 			std::cout << "value " << i << " cannot be read" << std::endl;
 			return false;
 		}
-		
+
 	}
 
 	return true;

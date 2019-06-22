@@ -8,7 +8,7 @@
 #include <gtc/matrix_transform.hpp>
 
 #define OUT
-
+#define VEC3VALS 3
 
 typedef glm::vec3 vec3;
 typedef glm::mat4 mat4;

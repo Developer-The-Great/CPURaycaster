@@ -5,7 +5,7 @@
 class Sphere : public PrimitiveObject
 {
 public:
-	Sphere(glm::vec3 positionToSet, glm::vec3 ambientToSet, float radiusToSet);
+	Sphere(vec3 positionToSet,vec3 diffuseToSet, vec3 ambientToSet, float radiusToSet);
 
 	float GetRadius() const;
 	glm::vec3 GetPosition() const;

@@ -7,7 +7,7 @@ class TriangularObject:public PrimitiveObject
 {
 
 public:
-	TriangularObject(glm::vec3 AmbientToSet, glm::vec3 PositionToSet, std::vector<glm::vec3>vertices, std::vector<int>indices);
+	TriangularObject(glm::vec3 AmbientToSet, vec3 diffuseToSet,glm::vec3 PositionToSet, std::vector<glm::vec3>vertices, std::vector<int>indices);
 	
 	std::vector<Triangle> GetTriangles();
 	~TriangularObject();

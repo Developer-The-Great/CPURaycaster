@@ -5,7 +5,7 @@
 
 
 
-Sphere::Sphere(glm::vec3 positionToSet,glm::vec3 ambientToSet, float radiusToSet):PrimitiveObject(ambientToSet,positionToSet)
+Sphere::Sphere(glm::vec3 positionToSet, vec3 diffuseToSet,glm::vec3 ambientToSet, float radiusToSet):PrimitiveObject(ambientToSet, diffuseToSet,positionToSet)
 {
 	std::cout << "Sphere Created" << std::endl;
 	std::cout << "Position " << glm::to_string(positionToSet) << std::endl;

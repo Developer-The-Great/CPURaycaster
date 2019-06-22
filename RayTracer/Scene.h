@@ -9,6 +9,7 @@
 
 #include "PrimitiveObject.h"
 #include "Camera.h"
+#include "Light.h"
 
 
 class Scene
@@ -16,22 +17,27 @@ class Scene
 public:
 	int width, height;
 	
-	
-
 	std::vector<glm::vec3> vertices;
 	
 	Scene(std::string fileName);
 
-	glm::vec3 CameraPos;
-	glm::vec3 Up;
-	glm::vec3 CameraLookAt;
+	vec3 CameraPos;
+	vec3 Up;
+	vec3 CameraLookAt;
+	vec3 emission;
 
 	Camera* GetCam();
 
 	float Fov;
 
 	std::vector<PrimitiveObject*> GetPrimitives();
+	std::vector<Light*> GetLights();
+	
+
 	void AddPrimitive(PrimitiveObject* obj);
+	void AddLight(Light* light);
+
+	
 
 	~Scene();
 private:
@@ -40,9 +46,11 @@ private:
 
 	std::vector<PrimitiveObject*> primitives;
 
+	std::vector<Light*> lights;
+
 	Camera *Cam;
 
-
+	
 
 };
 

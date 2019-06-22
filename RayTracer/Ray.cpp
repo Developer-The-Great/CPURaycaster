@@ -12,8 +12,7 @@
 #include <vector>
 #include <assert.h> 
 
-#define MAX_DISTANCE 1000000
-#define EPSILON 0.001
+
 
 
 Ray::Ray(float sceneWidth,float sceneHeight)
@@ -29,17 +28,24 @@ Ray::~Ray()
 
 glm::vec3 Ray::GetRayDirection()
 {
-	return glm::vec3();
+	return rayDirection;
 }
 
-void Ray::FindRayDirection(Camera * cam, int i, int j)
+
+
+
+vec3 Ray::FindRayDirection(Camera * cam, int i, int j)
 {
 	float maxAngleY = glm::tan(glm::radians(cam->GetFov() / 2.0f));
 	float maxAngleX = maxAngleY * (width / height);
 
-	float alphaC = (j+0.5f - (width / 2)) / (width / 2);
+	//add 0.5f to get the center of the pixel
+	float jCenter = j + 0.5f;
+	float iCenter = i + 0.5f;
 
-	float betaC = ((height / 2) - i + 0.5f) / (height / 2);
+	float alphaC = (jCenter - (width / 2)) / (width / 2);
+
+	float betaC = ((height / 2) - iCenter) / (height / 2);
 
 	float alpha = maxAngleX * alphaC;
 	
@@ -57,28 +63,25 @@ void Ray::FindRayDirection(Camera * cam, int i, int j)
 
 	rayDirection = direction;
 
+	return rayDirection;
 }
 
-
-
-PrimitiveObject * Ray::IntersectionCheck( Scene*scene)
+RayIntersectInformation Ray::IntersectionCheck(vec3 eyePos, vec3 direction, std::vector<PrimitiveObject*> objects, float maxDistance)
 {
-	//intialize minimal distance to a big number
-	float minDistance = MAX_DISTANCE;
+	//intialize minimal distance to the max distance of the ray
+	float minDistance = maxDistance;
 
-	std::vector<PrimitiveObject*> objects = scene->GetPrimitives();
+	RayIntersectInformation intersectionInfo;
+
 	std::vector<PrimitiveObject*>::iterator iter;
-	PrimitiveObject * Obj = nullptr;
 
-	vec3 eyePos = scene->GetCam()->GetCamPos();
 	//for each object in scene
 	for (iter = objects.begin(); iter != objects.end(); ++iter)
 	{
 		//determine object type
-		//TriangularObject obj((TriangularObject)*iter);
 		TriangularObject* TriangularObj = dynamic_cast<TriangularObject*>(*iter);
 
-		//if primitive object is a triangle
+		//if primitive object is a trianglular object
 		if (TriangularObj)
 		{
 			std::vector<Triangle>::iterator triangleIter;
@@ -87,14 +90,84 @@ PrimitiveObject * Ray::IntersectionCheck( Scene*scene)
 
 			for (triangleIter = triangles.begin(); triangleIter != triangles.end(); ++triangleIter)
 			{
-				RayIntersectInformation intersectionInfo = RayTriangleIntersect(*triangleIter, eyePos,TriangularObj->transform);
-				
-				if (!intersectionInfo.isIntersecting) { continue; }
+				RayIntersectInformation currentIntersectionInfo = RayTriangleIntersect(*triangleIter, eyePos, TriangularObj->transform);
 
-				if (intersectionInfo.t > 0 && intersectionInfo.t < minDistance)
+				if (!currentIntersectionInfo.isIntersecting) { continue; }
+
+				if (currentIntersectionInfo.t > 0 && currentIntersectionInfo.t < minDistance)
 				{
-					minDistance = intersectionInfo.t;
-					Obj = TriangularObj;
+					minDistance = currentIntersectionInfo.t;
+					intersectionInfo.obj = TriangularObj;
+
+				}
+			}
+		}
+
+		else
+		{
+			Sphere* sphere = dynamic_cast<Sphere*>(*iter);
+			//if primitive object is a sphere
+			if (sphere)
+			{
+				assert(sphere);
+
+				RayIntersectInformation currentIntersectionInfo = RaySphereIntersect(sphere, eyePos);
+
+				if (!currentIntersectionInfo.isIntersecting) { continue; }
+
+				if (currentIntersectionInfo.t > 0 && currentIntersectionInfo.t < minDistance)
+				{
+					minDistance = currentIntersectionInfo.t;
+					intersectionInfo.obj = sphere;
+
+				}
+
+			}
+
+
+		}
+
+	}
+
+
+	return intersectionInfo;
+}
+
+RayIntersectInformation Ray::IntersectionCheck( Scene*scene, float maxDistance)
+{
+	//intialize minimal distance to the max distance of the ray
+	float minDistance = maxDistance;
+
+	RayIntersectInformation intersectionInfo;
+
+	std::vector<PrimitiveObject*> objects = scene->GetPrimitives();
+
+	std::vector<PrimitiveObject*>::iterator iter;
+
+	vec3 eyePos = scene->GetCam()->GetCamPos();
+	//for each object in scene
+	for (iter = objects.begin(); iter != objects.end(); ++iter)
+	{
+		//determine object type
+		TriangularObject* TriangularObj = dynamic_cast<TriangularObject*>(*iter);
+
+		//if primitive object is a trianglular object
+		if (TriangularObj)
+		{
+			std::vector<Triangle>::iterator triangleIter;
+
+			std::vector<Triangle> triangles = TriangularObj->GetTriangles();
+
+			for (triangleIter = triangles.begin(); triangleIter != triangles.end(); ++triangleIter)
+			{
+				RayIntersectInformation currentIntersectionInfo = RayTriangleIntersect(*triangleIter, eyePos,TriangularObj->transform);
+				
+				if (!currentIntersectionInfo.isIntersecting) { continue; }
+
+				if (currentIntersectionInfo.t > 0 && currentIntersectionInfo.t < minDistance)
+				{
+					minDistance = currentIntersectionInfo.t;
+					intersectionInfo.obj = TriangularObj;
 
 				}
 			}
@@ -108,14 +181,14 @@ PrimitiveObject * Ray::IntersectionCheck( Scene*scene)
 			{
 				assert(sphere);
 
-				RayIntersectInformation intersectionInfo = RaySphereIntersect(sphere, eyePos);
+				RayIntersectInformation currentIntersectionInfo = RaySphereIntersect(sphere, eyePos);
 				
-				if (!intersectionInfo.isIntersecting) { continue; }
+				if (!currentIntersectionInfo.isIntersecting) { continue; }
 
-				if (intersectionInfo.t > 0 && intersectionInfo.t < minDistance)
+				if (currentIntersectionInfo.t > 0 && currentIntersectionInfo.t < minDistance)
 				{
-					minDistance = intersectionInfo.t;
-					Obj = sphere;
+					minDistance = currentIntersectionInfo.t;
+					intersectionInfo.obj = sphere;
 
 				}
 
@@ -127,19 +200,20 @@ PrimitiveObject * Ray::IntersectionCheck( Scene*scene)
 	}
 		
 	
-	return Obj;
+	return intersectionInfo;
 }
+
+
 
 RayIntersectInformation Ray::RayTriangleIntersect(Triangle tri,glm::vec3 EyePos,mat4 transforms)
 {
 	
-
 	RayIntersectInformation result;
-
-	
 
 	vec4 rayOrigin(EyePos, 1);
 	vec4 rayDir(rayDirection, 0);
+
+	//std::cout << glm::to_string(transforms) << std::endl;
 
 	rayOrigin = glm::inverse(transforms)* rayOrigin;
 	rayDir =   glm::inverse(transforms)*rayDir;
@@ -154,18 +228,21 @@ RayIntersectInformation Ray::RayTriangleIntersect(Triangle tri,glm::vec3 EyePos,
 	vec4 c(cVec3,1);
 	//a-b,c-b
 	vec3 normalVec3 = glm::cross(aVec3-bVec3,cVec3-bVec3);
+	//set normal
+	result.normal = normalVec3;
 	vec4 normal(normalVec3,1);
 
-	//normal = glm::normalize(normal);
-
-	
 	float normalDotDirection = glm::dot(normal, rayDir);
 
 	float normalDotPoint = glm::dot(a, normal);
 	float normalDotOrigin = glm::dot(rayOrigin, normal);
 	//find t
 	float t = (normalDotPoint - normalDotOrigin) / normalDotDirection;
-
+	
+	if (itest == 300 && jtest == 300)
+	{
+		std::cout << "t " <<  t << std::endl;
+	}
 
 	if (t < 0)
 	{
@@ -176,7 +253,8 @@ RayIntersectInformation Ray::RayTriangleIntersect(Triangle tri,glm::vec3 EyePos,
 	//find point where ray intersects the plane where the triangle lies
 	vec4 P = rayOrigin + rayDir * t;
 
-
+	//find non-transformed point
+	result.intersectionPoint = transforms * P;
 	//---Barycentric Coordinate Solve-----
 
 	vec3 v0 = b - a;
@@ -189,16 +267,19 @@ RayIntersectInformation Ray::RayTriangleIntersect(Triangle tri,glm::vec3 EyePos,
 	float d11 = glm::dot(v1, v1);
 	float d20 = glm::dot(v2, v0);
 	float d21 = glm::dot(v2, v1);
-	//apply cramers rule
+	
 
 	//find denominator
 	float denom = d00 * d11 - d01 * d10;
 
-
+	//apply cramers rule
 	float v = (d20 * d11 - d21 * d10)/denom;
 
 	//---- P is in triangle if u + v + w = 1 ------
-
+	if (itest == 300 && jtest == 300)
+	{
+		std::cout << "v " << v << std::endl;
+	}
 	if (v < 0 || v > 1)
 	{
 		result.isIntersecting = false;
@@ -207,6 +288,11 @@ RayIntersectInformation Ray::RayTriangleIntersect(Triangle tri,glm::vec3 EyePos,
 	}
 
 	float w = (d00 * d21 - d01 * d20) / denom;
+
+	if (itest == 300 && jtest == 300)
+	{
+		std::cout << "w " << w << std::endl;
+	}
 
 	if (w < 0 || w > 1)
 	{
@@ -243,6 +329,7 @@ RayIntersectInformation Ray::RaySphereIntersect(const Sphere* sphere,glm::vec3 e
 	p0 = glm::inverse(sphere->transform) * p0;
 	p1 = glm::inverse(sphere->transform) * p1;
 
+	
 
 	//ax2 + bx + c = 0
 	//P0 = eye
@@ -284,12 +371,17 @@ RayIntersectInformation Ray::RaySphereIntersect(const Sphere* sphere,glm::vec3 e
 			{
 				result.isIntersecting = true;
 				result.t = t2;
+				result.intersectionPoint = FindNonTransformedIntersectionPosistion(p0, p1, t2, sphere->transform);
+				result.normal = glm::normalize(vec3(result.intersectionPoint) - sphere->GetPosition());
+				//find first intersecting point of ray
 				return result;
 			}
 			else
 			{
 				result.isIntersecting = true;
 				result.t = t1;
+				result.intersectionPoint = FindNonTransformedIntersectionPosistion(p0, p1, t1, sphere->transform);
+				result.normal = glm::normalize(vec3(result.intersectionPoint) - sphere->GetPosition());
 				return result;
 			
 			}
@@ -318,6 +410,22 @@ RayIntersectInformation Ray::RaySphereIntersect(const Sphere* sphere,glm::vec3 e
 
 
 	return result;
+}
+float Ray::GetDefaultMaxT()
+{
+	return A_VERY_BIG_NUMBER;
+}
+glm::vec4 Ray::FindNonTransformedIntersectionPosistion(vec4 p0, vec4 p1, float t, mat4 transform)
+{
+	vec4 P = p0 + p1 * t;
+	vec4 transformedIntersectPoint = transform * P;
+
+	return transformedIntersectPoint;
+}
+
+void Ray::SetRayDirection(vec3 direction)
+{
+	rayDirection = direction;
 }
 
 float Ray::QuadraticSolve(float a, float b, float c, bool positive)

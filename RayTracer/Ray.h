@@ -6,6 +6,8 @@
 
 
 #define OUT
+#define A_VERY_BIG_NUMBER 1000000
+#define EPSILON 0.001
 
 typedef glm::vec4 vec4;
 typedef glm::vec3 vec3;
@@ -20,6 +22,9 @@ class Sphere;
 struct RayIntersectInformation
 {
 	bool isIntersecting;
+	PrimitiveObject* obj = nullptr;
+	vec3 normal;
+	vec4 intersectionPoint;
 	float t;
 
 };
@@ -34,15 +39,24 @@ public:
 
 	glm::vec3 GetRayDirection();
 
-	void FindRayDirection(Camera*cam, int i, int j);
+	glm::vec4 FindNonTransformedIntersectionPosistion(vec4 p0, vec4 p1, float t, mat4 transform);
 
-	PrimitiveObject * IntersectionCheck(Scene*scene);
+
+	vec3 FindRayDirection(Camera*cam, int i, int j);
+
+	
+
+	void SetRayDirection(vec3 direction);
+
+	RayIntersectInformation IntersectionCheck(Scene*scene, float maxDistance = A_VERY_BIG_NUMBER);
+
+	RayIntersectInformation IntersectionCheck(vec3 EyePos, vec3 direction, std::vector<PrimitiveObject*> objects, float maxDistance = A_VERY_BIG_NUMBER);
 
 	RayIntersectInformation RayTriangleIntersect(Triangle tri, glm::vec3 EyePos, mat4 transforms);
 
 	RayIntersectInformation RaySphereIntersect(const Sphere* sphere, glm::vec3 eyePos);
 
-	
+	static float GetDefaultMaxT();
 	
 
 private:
@@ -55,5 +69,7 @@ private:
 	glm::vec3 rayDirection;
 
 	float QuadraticSolve(float a, float b, float c, bool positive);
+
+	
 };
 

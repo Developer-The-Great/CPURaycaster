@@ -16,7 +16,7 @@ Scene::Scene(std::string fileName)
 
 	cout << "width " << width << endl;
 	cout << "height " << height << endl;
-
+	//initialize cam
 	Cam = new Camera(CameraPos, CameraLookAt,Up, Fov);
 
 
@@ -35,20 +35,31 @@ std::vector<PrimitiveObject*> Scene::GetPrimitives()
 	return primitives;
 }
 
+std::vector<Light*> Scene::GetLights()
+{
+	return lights;
+}
+
 void Scene::AddPrimitive(PrimitiveObject* obj)
 {
 	primitives.push_back(obj);
 }
 
+void Scene::AddLight(Light* light)
+{
+	lights.push_back(light);
+}
+
 Scene::~Scene()
 {
-
+	//delete primitives
 	for (auto obj : primitives)
 	{
 		delete obj;
 	}
+
 	primitives.clear();
-	
+	//delete cam
 	delete Cam;
 }
 
@@ -80,5 +91,8 @@ void Scene::checkSceneValidity()
 		}
 		
 	}
+
+	
+
 
 }

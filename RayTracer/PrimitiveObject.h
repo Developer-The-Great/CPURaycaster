@@ -5,23 +5,27 @@
 #include <vector>
 
 typedef glm::mat4 mat4;
+typedef glm::vec3 vec3;
 
 class PrimitiveObject
 {
 public:
-	PrimitiveObject(glm::vec3 ambientToSet,glm::vec3 PositionToSet);
+	PrimitiveObject(vec3 ambientToSet, vec3 diffuseToSet,vec3 PositionToSet);
 	PrimitiveObject();
 
 	mat4 transform;
 
 	virtual glm::vec3 GetAmbient();
+	glm::vec3 GetDiffuse();
+
 	~PrimitiveObject();
 
 private:
 
 protected:
-	glm::vec3 ambient;
-	glm::vec3 position;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 position;
 
 	
 };
