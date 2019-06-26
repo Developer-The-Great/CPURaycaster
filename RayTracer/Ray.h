@@ -12,6 +12,7 @@
 typedef glm::vec4 vec4;
 typedef glm::vec3 vec3;
 typedef glm::mat4 mat4;
+typedef glm::mat3 mat3;
 
 class Camera;
 class PrimitiveObject;
@@ -37,24 +38,19 @@ public:
 
 	~Ray();
 
-	glm::vec3 GetRayDirection();
+	
 
 	glm::vec4 FindNonTransformedIntersectionPosistion(vec4 p0, vec4 p1, float t, mat4 transform);
 
 
 	vec3 FindRayDirection(Camera*cam, int i, int j);
 
-	
-
-	void SetRayDirection(vec3 direction);
-
-	RayIntersectInformation IntersectionCheck(Scene*scene, float maxDistance = A_VERY_BIG_NUMBER);
 
 	RayIntersectInformation IntersectionCheck(vec3 EyePos, vec3 direction, std::vector<PrimitiveObject*> objects, float maxDistance = A_VERY_BIG_NUMBER);
 
-	RayIntersectInformation RayTriangleIntersect(Triangle tri, glm::vec3 EyePos, mat4 transforms);
+	RayIntersectInformation RayTriangleIntersect(Triangle tri, glm::vec3 EyePos,  glm::vec3 direction, mat4 transforms);
 
-	RayIntersectInformation RaySphereIntersect(const Sphere* sphere, glm::vec3 eyePos);
+	RayIntersectInformation RaySphereIntersect(const Sphere* sphere, glm::vec3 direction, glm::vec3 eyePos);
 
 	static float GetDefaultMaxT();
 	
@@ -65,8 +61,6 @@ private:
 	float height;
 
 	int itest, jtest;
-
-	glm::vec3 rayDirection;
 
 	float QuadraticSolve(float a, float b, float c, bool positive);
 

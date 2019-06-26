@@ -48,7 +48,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 	bool validInput;
 	int verts = 0;
 	std::string oldCmd = "";
-
+	int id = 0;
 	while (std::getline(File, str))
 	{
 		std::stringstream s(str);
@@ -150,7 +150,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 					std::cout << "values " << values[0] << " " << values[1] << " " << values[2] << " " << std::endl;
 					vec3 spherePos(values[0], values[1], values[2]);
 					Sphere* sphere = new Sphere(spherePos,diffuse, ambient, values[3]);
-
+					sphere->CurrentID = id;
 					scene->AddPrimitive(sphere);
 					sphere->transform = stack.top();
 				}
@@ -263,6 +263,14 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				}
 
 			}
+			else if (cmd == "id")
+			{
+				validInput = GetValues(s, 1, values);
+				if (validInput)
+				{
+					id = values[0];
+				}
+			}
 
 		}
 
@@ -281,7 +289,7 @@ void FileReader::ReadFile(std::string fileName, OUT Scene * scene)
 				TriangularObject* Obj = new TriangularObject(ambient,diffuse, position, scene->vertices, tempIndices);
 				scene->AddPrimitive(Obj);
 				Obj->transform = stack.top();
-
+				Obj->CurrentID = id;
 
 				std::cout << "--[x]triangular object created" << TriCount << std::endl;
 				tempIndices.clear();

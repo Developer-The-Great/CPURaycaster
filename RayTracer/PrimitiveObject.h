@@ -18,10 +18,12 @@ public:
 	virtual glm::vec3 GetAmbient();
 	glm::vec3 GetDiffuse();
 
+	int CurrentID;
+	
 	~PrimitiveObject();
 
 private:
-
+	
 protected:
 	vec3 ambient;
 	vec3 diffuse;

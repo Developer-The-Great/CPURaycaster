@@ -7,6 +7,7 @@
 
 PrimitiveObject::PrimitiveObject(vec3 ambientToSet, vec3 diffuseToSet,vec3 PositionToSet)
 {
+
 	ambient = ambientToSet * COLOR;
 	diffuse = diffuseToSet * COLOR;
 	position = PositionToSet;

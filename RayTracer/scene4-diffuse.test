@@ -2,7 +2,8 @@
 # Intended to show transforms
 # I know it's not the most exciting of scenes...
 
-size 160 120 
+#size 160 120 
+size 640 480
 output scene4-diffuse.png
 #scene4-diffuse.test
 camera 0 -4 4 0 -1 0 0 1 1 45
@@ -33,9 +34,9 @@ pushTransform
 # repeat this to create many cubes.  For extra credit, you can implement 
 # instancing to make this simpler.  Alternatively, define a ray-cube 
 # intersection test.
-
+#bigbox
 diffuse .7 .7 1
-
+id 0
 scale 2 1 .25
 tri 0 1 5 
 tri 0 5 4 
@@ -57,7 +58,7 @@ pushTransform
 # Note that like OpenGL, commands right-multiply
 
 diffuse .7 .7 .4
-
+id 1
 translate -1.75 -.8 -.25 
 translate 0 0 -2.0 
 scale 0.15 0.15 2.0 
@@ -75,7 +76,7 @@ tri 4 5 6
 tri 4 6 7 
 
 # leg 2: Note that I'm only changing a single translation command.
-
+id 2
 popTransform
 pushTransform 
 translate +1.75 -.8 -.25
@@ -95,7 +96,7 @@ tri 4 5 6
 tri 4 6 7 
 
 # leg 3: Note that I'm only changing a single translation command.
-
+id 3
 popTransform
 pushTransform 
 translate +1.75 +.8 -.25
@@ -115,7 +116,7 @@ tri 4 5 6
 tri 4 6 7 
 
 # leg 4: Note that I'm only changing a single translation command.
-
+id 4
 popTransform
 pushTransform 
 translate -1.75 +.8 -.25
@@ -136,7 +137,8 @@ tri 4 6 7
 
 
 # Now draw the spheres
-
+id 5
+#squished 1
 diffuse 0 1 0 
 popTransform
 pushTransform 
@@ -145,6 +147,8 @@ rotate 0 0 1 45
 scale 1.0 0.25 0.25 
 sphere 0 0 0 1
 
+id 6
+#squished 2
 diffuse 1 0 0
 popTransform
 pushTransform 
@@ -153,6 +157,8 @@ rotate 0 0 1 -45
 scale 1.0 0.25 0.25 
 sphere 0 0 0 1
 
+id 7
+#left top
 diffuse 0 1 1 
 popTransform
 pushTransform
@@ -160,6 +166,8 @@ translate -1.5 -.8 0.65
 scale 0.4 0.4 0.4
 sphere 0 0 0 1
 
+id 8
+#left top
 diffuse 0 1 1 
 popTransform
 pushTransform
